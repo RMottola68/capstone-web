@@ -5,6 +5,7 @@ function App() {
   
 const [categories, setCategories] = useState([]);
 const [selectedCategory, setSelectedCategory] = useState([]);
+const [questions, setQuestions] = useState();
 
 const fetchCategories = async () => {
   const res = await fetch(`http://localhost:3000/api/v1/categories`);
@@ -13,6 +14,15 @@ const fetchCategories = async () => {
 }
 
 const fetchQuestions = async () => {
+
+}
+
+const fetchQuestionsForCategory = async (id) => {
+  console.log('fetch questions for category id');
+  let res = await fetch(`http://localhost:3000/api/v1/categories/${id}/questions`);
+  let data = await res.json();
+  console.log(data);
+  setQuestions(data);
 
 }
 
@@ -40,11 +50,18 @@ const fetchQuestions = async () => {
         
         <div className={"col-12 col-md-4 p-3 inline-flex"}>
           
-          <div className={"row"}>
+          <div className={"row"}>Currently Selected Category is: {selectedCategory}
             
             <ul className={'list-unstyled'}>
               {categories.map((category, index) => {
-                return <li key={index} className={category.id == selectedCategory ? 'border my-1 bg-success text-light cursor-pointer' : 'border my-1 cursor-pointer' } onClick={() => setSelectedCategory(category.id)}>{category.name}</li>
+                return <li key={index} 
+                  className={category.id == selectedCategory ? 'border my-1 bg-success text-light cursor-pointer' : 'border my-1 cursor-pointer' } 
+                  onClick={() => {setSelectedCategory(category.id)
+                  fetchQuestionsForCategory(category.id)
+                  }}>
+                  {category.name}
+                
+                </li>
               })}
             </ul>
 
@@ -55,6 +72,7 @@ const fetchQuestions = async () => {
         <div className={"col-12 col-md-8 border p3"}>
           <div className={"Row"}>
             <div>answers?</div>
+            {questions && <p>{JSON.stringify(questions)}</p>}
           </div>
         </div>
        </div>
