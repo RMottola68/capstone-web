@@ -77,7 +77,7 @@ const createNewQuestion = async () => {
         <div className={"col-12 col-md-8 border p3"}>
           <div className={"Row"}>
             <div>answers?</div>
-              <button className={'btn btn-outline-success'} onClick={createNewQuestio}>New Question</button>
+              <button className={'btn btn-outline-success'} onClick={createNewQuestion}>New Question</button>
               <ul>
                 {questions && questions.map((question) => {
                   return <li key={question.id}>
