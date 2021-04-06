@@ -26,6 +26,10 @@ const fetchQuestionsForCategory = async (id) => {
 
 }
 
+const createNewQuestion = async () => {
+  console.log('createdd new question for categoryId ', selectedCategory)
+}
+
   useEffect(() => {
 
     fetchCategories();
@@ -72,7 +76,16 @@ const fetchQuestionsForCategory = async (id) => {
         <div className={"col-12 col-md-8 border p3"}>
           <div className={"Row"}>
             <div>answers?</div>
-            {questions && <p>{JSON.stringify(questions)}</p>}
+              <button className={'btn btn-outline-success'} onClick={createNewQuestion}>New Question</button>
+              <ul>
+                {questions && questions.map((question) => {
+                  return <li key={question.id}>
+                    {question.questionTxt} {question.Answers.length > 0 && <span>- <span>{question.Answers.length}</span></span>}
+
+                  </li>
+                })}
+              </ul>
+            {/* {questions && <p>{JSON.stringify(questions)}</p>} */}
           </div>
         </div>
        </div>
