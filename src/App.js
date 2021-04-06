@@ -9,6 +9,7 @@ const [questions, setQuestions] = useState();
 
 const fetchCategories = async () => {
   console.log(process.env.API_URL);
+  console.log(process.env.REACT_APP_API_URL);
   // let res = await fetch(`${process.env.API_URL}/api/v1/categories`);
   // let data = await res.json();
   // setCategories(data);
