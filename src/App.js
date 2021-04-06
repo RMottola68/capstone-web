@@ -8,9 +8,10 @@ const [selectedCategory, setSelectedCategory] = useState([]);
 const [questions, setQuestions] = useState();
 
 const fetchCategories = async () => {
-  const res = await fetch(`http://localhost:3000/api/v1/categories`);
-  let data = await res.json();
-  setCategories(data);
+  console.log(process.env.API_URL);
+  // let res = await fetch(`${process.env.API_URL}/api/v1/categories`);
+  // let data = await res.json();
+  // setCategories(data);
 }
 
 const fetchQuestions = async () => {
@@ -76,7 +77,7 @@ const createNewQuestion = async () => {
         <div className={"col-12 col-md-8 border p3"}>
           <div className={"Row"}>
             <div>answers?</div>
-              <button className={'btn btn-outline-success'} onClick={createNewQuestion}>New Question</button>
+              <button className={'btn btn-outline-success'} onClick={createNewQuestio}>New Question</button>
               <ul>
                 {questions && questions.map((question) => {
                   return <li key={question.id}>
