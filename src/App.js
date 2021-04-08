@@ -11,6 +11,7 @@ function App() {
 const [categories, setCategories] = useState([]);
 const [selectedCategory, setSelectedCategory] = useState([]);
 const [questions, setQuestions] = useState();
+const [newQuestion, setNewQuestion] = useState('');
 
 let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
@@ -36,6 +37,11 @@ const fetchQuestionsForCategory = async (id) => {
 
 const createNewQuestion = async () => {
   console.log('createdd new question for categoryId ', selectedCategory)
+  let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions`, {method: 'POST',
+  headers:{'Content-Type': 'application/json'},
+  body: JSON.stringify({questionTxt: newQuestion})
+  });
+  setNewQuestion('');
 }
 
   useEffect(() => {
@@ -108,8 +114,14 @@ const createNewQuestion = async () => {
                 })}
               </ul> */}
 
-              <input type={'text'} className={'border'}/> 
-              <button>Create New Question</button>
+          <div className='py-3 m-5'>
+            <div className={'d-flex justify-content-center'}>
+                    <input type="text" value={newQuestion} onChange={(ev) => {
+                      setNewQuestion(ev.currentTarget.value);
+                    }}placeholder={'New Question Here'} className={'p-1 mx-2 w-100'}></input>
+                    <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success mr-2'}>Add</button>            
+            </div>
+          </div>
               
               <Collapse accordion>
                 {questions && questions.map((question, index) =>{
@@ -118,7 +130,7 @@ const createNewQuestion = async () => {
                       size="large"
                       //header={<div className={'font-weight-bold'}>Answer List</div>}
                       footer = {<div>
-                        <Button type={'primary'}>Add Answer</Button>
+                        <button type={'button'}className={'btn btn-outline-success'}>Add Answer</button>
                       </div>}
                       bordered
                       dataSource={question.Answers}
