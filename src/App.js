@@ -9,14 +9,16 @@ const { Panel } = Collapse;
 function App() {
   
 const [categories, setCategories] = useState([]);
-const [selectedCategory, setSelectedCategory] = useState([]);
+const [selectedCategory, setSelectedCategory] = useState();
 const [questions, setQuestions] = useState();
 const [newQuestion, setNewQuestion] = useState('');
+// const [selectedQuestion, setSelectedQuestion] = useState(); use this for new answer button
+const [newAnswer, setNewAnswer] = useState('');
 
 let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
 const fetchCategories = async () => {
-  console.log(process.env.REACT_APP_API_URL);
+  //console.log(process.env.REACT_APP_API_URL);
   let res = await fetch(`${apiUrl}/api/v1/categories`);
   let data = await res.json();
   setCategories(data);
@@ -42,6 +44,16 @@ const createNewQuestion = async () => {
   body: JSON.stringify({questionTxt: newQuestion})
   });
   setNewQuestion('');
+  fetchQuestionsForCategory(selectedCategory);
+}
+
+const createNewAnswer = async () => {
+  console.log('This creates a new answer!')
+  //you may have to create a selected answer state for this
+  // let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/${}/answer`, {method: 'POST',
+  // headers:{'Content-Type': 'application/json'},
+  // body: JSON.stringify({questionTxt: newQuestion})
+  // });)
 }
 
   useEffect(() => {
@@ -103,7 +115,7 @@ const createNewQuestion = async () => {
 
         <div className={"col-12 col-md-8 border p3"}>
           <div className={"Row"}>
-            <div>answers?</div>
+            
               {/* <button className={'btn btn-outline-success'} onClick={createNewQuestion}>New Question</button> */}
               {/* <ul>
                 {questions && questions.map((question) => {
@@ -114,37 +126,44 @@ const createNewQuestion = async () => {
                 })}
               </ul> */}
 
-          <div className='py-3 m-5'>
-            <div className={'d-flex justify-content-center'}>
+          {selectedCategory && 
+            <div className={'d-flex justify-content-center py-2'}>
                     <input type="text" value={newQuestion} onChange={(ev) => {
                       setNewQuestion(ev.currentTarget.value);
-                    }}placeholder={'New Question Here'} className={'p-1 mx-2 w-100'}></input>
-                    <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success mr-2'}>Add</button>            
+                    }}placeholder={'New Question Here'} className={'p-1 mx-2 w-75'}></input>
+                    <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success'}>Add Question</button>            
             </div>
-          </div>
+          }
               
-              <Collapse accordion>
-                {questions && questions.map((question, index) =>{
-                  return <Panel header={question.questionTxt} key={index}>
-                    <List
-                      size="large"
-                      //header={<div className={'font-weight-bold'}>Answer List</div>}
-                      footer = {<div>
-                        <button type={'button'}className={'btn btn-outline-success'}>Add Answer</button>
-                      </div>}
-                      bordered
-                      dataSource={question.Answers}
-                      renderItem={answer => <List.Item>
-                        <div>
-                          {answer.answerTxt}
-                        </div>
-                      </List.Item>}
-                    />
-                    </Panel>
-                
-                })}
-                
-              </Collapse>
+            {selectedCategory && <Collapse accordion>
+              {questions && questions.map((question, index) =>{
+                return <Panel header={question.questionTxt} key={index}>
+                  <List
+                    size="large"
+                    //header={<div className={'font-weight-bold'}>Answer List</div>}
+                    footer = {<div className={'d-flex justify-content-center py-2'}>
+                      <input type="text" onChange={(ev) => {
+                        setNewAnswer(ev.currentTarget.value);
+                      }}placeholder={'New Answer Here'} className={'p-1 mx-2 w-75'}></input>
+                      <button type={'primary'} className={'taskButton btn btn-success'}>Add Answer</button>            
+                      </div>
+                    }
+                    bordered
+                    dataSource={question.Answers}
+                    renderItem={answer => <List.Item>
+                      <div>
+                        {answer.answerTxt}
+                      </div>
+                    </List.Item>}
+                  />
+                  </Panel>
+              
+              })}
+              
+            </Collapse>}
+
+            {!selectedCategory && <h1 className={'text-center'}>Select a Category!</h1>}
+
             {/* {questions && <p>{JSON.stringify(questions)}</p>} */}
           </div>
         </div>
