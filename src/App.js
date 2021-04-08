@@ -1,4 +1,9 @@
+import './App.css';
 import React, {useEffect, useState} from 'react';
+
+//ant design stuff
+import { Button , List , Collapse } from 'antd';
+const { Panel } = Collapse;
 
 
 function App() {
@@ -56,10 +61,24 @@ const createNewQuestion = async () => {
        <div className={'row inline-flex'}>
         
         <div className={"col-12 col-md-4 p-3 inline-flex"}>
-          
-          <div className={"row"}>Currently Selected Category is: {selectedCategory}
+          <div className={"row"}>
+
+            <List
+              size="large"
+              header={<div className={'font-weight-bold'}>Category List</div>}
+              bordered
+              dataSource={categories}
+              renderItem={category => <List.Item>
+                <div className={category.id == selectedCategory ? 'my-1 px-1 bg-success text-light cursor-pointer' : 'my-1 cursor-pointer' } 
+                  onClick={() => {setSelectedCategory(category.id)
+                  fetchQuestionsForCategory(category.id)
+                }}>
+                  {category.name}
+                </div>
+              </List.Item>}
+            />
             
-            <ul className={'list-unstyled'}>
+            {/* <ul className={'list-unstyled'}>
               {categories.map((category, index) => {
                 return <li key={index} 
                   className={category.id == selectedCategory ? 'border my-1 bg-success text-light cursor-pointer' : 'border my-1 cursor-pointer' } 
@@ -70,7 +89,7 @@ const createNewQuestion = async () => {
                 
                 </li>
               })}
-            </ul>
+            </ul> */}
 
           </div>
 
@@ -79,15 +98,41 @@ const createNewQuestion = async () => {
         <div className={"col-12 col-md-8 border p3"}>
           <div className={"Row"}>
             <div>answers?</div>
-              <button className={'btn btn-outline-success'} onClick={createNewQuestion}>New Question</button>
-              <ul>
+              {/* <button className={'btn btn-outline-success'} onClick={createNewQuestion}>New Question</button> */}
+              {/* <ul>
                 {questions && questions.map((question) => {
                   return <li key={question.id}>
                     {question.questionTxt} {question.Answers.length > 0 && <span>- <span>{question.Answers.length}</span></span>}
 
                   </li>
                 })}
-              </ul>
+              </ul> */}
+
+              <input type={'text'} className={'border'}/> 
+              <button>Create New Question</button>
+              
+              <Collapse accordion>
+                {questions && questions.map((question, index) =>{
+                  return <Panel header={question.questionTxt} key={index}>
+                    <List
+                      size="large"
+                      //header={<div className={'font-weight-bold'}>Answer List</div>}
+                      footer = {<div>
+                        <Button type={'primary'}>Add Answer</Button>
+                      </div>}
+                      bordered
+                      dataSource={question.Answers}
+                      renderItem={answer => <List.Item>
+                        <div>
+                          {answer.answerTxt}
+                        </div>
+                      </List.Item>}
+                    />
+                    </Panel>
+                
+                })}
+                
+              </Collapse>
             {/* {questions && <p>{JSON.stringify(questions)}</p>} */}
           </div>
         </div>
