@@ -12,8 +12,9 @@ const [categories, setCategories] = useState([]);
 const [selectedCategory, setSelectedCategory] = useState();
 const [questions, setQuestions] = useState();
 const [newQuestion, setNewQuestion] = useState('');
-// const [selectedQuestion, setSelectedQuestion] = useState(); use this for new answer button
+const [selectedQuestion, setSelectedQuestion] = useState();
 const [newAnswer, setNewAnswer] = useState('');
+const [answers, setAnswers] = useState();
 
 let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
@@ -24,21 +25,25 @@ const fetchCategories = async () => {
   setCategories(data);
 }
 
-const fetchQuestions = async () => {
-
-}
-
 const fetchQuestionsForCategory = async (id) => {
   console.log('fetch questions for category id');
-  let res = await fetch(`http://localhost:3000/api/v1/categories/${id}/questions`);
+  let res = await fetch(`${apiUrl}/api/v1/categories/${id}/questions`);
   let data = await res.json();
   console.log(data);
   setQuestions(data);
 
 }
 
+const fetchAnswersForQuestion = async (id) => {
+  console.log('does this work?', selectedQuestion);
+  let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${id}/answers`);
+  let data = await res.json();
+  console.log(data);
+  setAnswers(data);
+}
+
 const createNewQuestion = async () => {
-  console.log('createdd new question for categoryId ', selectedCategory)
+  console.log('created new question for categoryId ', selectedCategory)
   let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions`, {method: 'POST',
   headers:{'Content-Type': 'application/json'},
   body: JSON.stringify({questionTxt: newQuestion})
@@ -49,11 +54,12 @@ const createNewQuestion = async () => {
 
 const createNewAnswer = async () => {
   console.log('This creates a new answer!')
-  //you may have to create a selected answer state for this
-  // let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/${}/answer`, {method: 'POST',
-  // headers:{'Content-Type': 'application/json'},
-  // body: JSON.stringify({questionTxt: newQuestion})
-  // });)
+  let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}/answers`, {method: 'POST',
+  headers:{'Content-Type': 'application/json'},
+  body: JSON.stringify({answerTxt: newAnswer})
+  });
+  setNewAnswer('');
+  fetchAnswersForQuestion(selectedQuestion);
 }
 
   useEffect(() => {
@@ -63,8 +69,6 @@ const createNewAnswer = async () => {
   }, [])
 
   useEffect(() => {
-
-    fetchQuestions();
 
   }, [selectedCategory])
   
@@ -134,18 +138,20 @@ const createNewAnswer = async () => {
                     <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success'}>Add Question</button>            
             </div>
           }
-              
-            {selectedCategory && <Collapse accordion>
+            {/* i need to set the selectedQuestion in here 4/9/2021 */}
+            {selectedCategory && <Collapse onChange={() => {setSelectedQuestion(selectedCategory.this)
+                  fetchAnswersForQuestion(selectedQuestion)
+                }} accordion>
               {questions && questions.map((question, index) =>{
-                return <Panel header={question.questionTxt} key={index}>
-                  <List
+                return <Panel 
+                header={question.questionTxt} key={index}>
+                  <List 
                     size="large"
-                    //header={<div className={'font-weight-bold'}>Answer List</div>}
                     footer = {<div className={'d-flex justify-content-center py-2'}>
-                      <input type="text" onChange={(ev) => {
+                      <input type="text" value={newAnswer} onChange={(ev) => {
                         setNewAnswer(ev.currentTarget.value);
                       }}placeholder={'New Answer Here'} className={'p-1 mx-2 w-75'}></input>
-                      <button type={'primary'} className={'taskButton btn btn-success'}>Add Answer</button>            
+                      <button type={'primary'} onClick={createNewAnswer} className={'taskButton btn btn-success'}>Add Answer</button>            
                       </div>
                     }
                     bordered
