@@ -10,11 +10,11 @@ function App() {
   
 const [categories, setCategories] = useState([]);
 const [selectedCategory, setSelectedCategory] = useState();
-const [questions, setQuestions] = useState();
+const [questions, setQuestions] = useState([]);
 const [newQuestion, setNewQuestion] = useState('');
 const [selectedQuestion, setSelectedQuestion] = useState();
 const [newAnswer, setNewAnswer] = useState('');
-const [answers, setAnswers] = useState();
+const [answers, setAnswers] = useState([]);
 
 let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
@@ -26,7 +26,7 @@ const fetchCategories = async () => {
 }
 
 const fetchQuestionsForCategory = async (id) => {
-  console.log('fetch questions for category id');
+  console.log('fetch questions for category id', id);
   let res = await fetch(`${apiUrl}/api/v1/categories/${id}/questions`);
   let data = await res.json();
   console.log(data);
@@ -35,7 +35,7 @@ const fetchQuestionsForCategory = async (id) => {
 }
 
 const fetchAnswersForQuestion = async (id) => {
-  console.log('does this work?', selectedQuestion);
+  console.log('fetch answers for question id', id);
   let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${id}/answers`);
   let data = await res.json();
   console.log(data);
@@ -53,13 +53,14 @@ const createNewQuestion = async () => {
 }
 
 const createNewAnswer = async () => {
-  console.log('This creates a new answer!')
+  console.log('This creates a new answer for questionId', selectedQuestion)
   let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}/answers`, {method: 'POST',
   headers:{'Content-Type': 'application/json'},
   body: JSON.stringify({answerTxt: newAnswer})
   });
   setNewAnswer('');
-  fetchAnswersForQuestion(selectedQuestion);
+  //fetchAnswersForQuestion(selectedQuestion);
+  fetchQuestionsForCategory(selectedCategory);
 }
 
   useEffect(() => {
@@ -69,8 +70,10 @@ const createNewAnswer = async () => {
   }, [])
 
   useEffect(() => {
-
+  
   }, [selectedCategory])
+
+
   
   return (
     <>
@@ -134,39 +137,72 @@ const createNewAnswer = async () => {
             <div className={'d-flex justify-content-center py-2'}>
                     <input type="text" value={newQuestion} onChange={(ev) => {
                       setNewQuestion(ev.currentTarget.value);
-                    }}placeholder={'New Question Here'} className={'p-1 mx-2 w-75'}></input>
+                    }} placeholder={'New Question Here'} className={'p-1 mx-2 w-75'}></input>
                     <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success'}>Add Question</button>            
             </div>
           }
-            {/* i need to set the selectedQuestion in here 4/9/2021 */}
-            {selectedCategory && <Collapse onChange={() => {setSelectedQuestion(selectedCategory.this)
-                  fetchAnswersForQuestion(selectedQuestion)
-                }} accordion>
-              {questions && questions.map((question, index) =>{
-                return <Panel 
-                header={question.questionTxt} key={index}>
-                  <List 
-                    size="large"
-                    footer = {<div className={'d-flex justify-content-center py-2'}>
-                      <input type="text" value={newAnswer} onChange={(ev) => {
-                        setNewAnswer(ev.currentTarget.value);
-                      }}placeholder={'New Answer Here'} className={'p-1 mx-2 w-75'}></input>
-                      <button type={'primary'} onClick={createNewAnswer} className={'taskButton btn btn-success'}>Add Answer</button>            
-                      </div>
-                    }
-                    bordered
-                    dataSource={question.Answers}
-                    renderItem={answer => <List.Item>
+
+          {selectedCategory && questions.map((question, index) => {
+            return <Collapse onChange={() => {fetchAnswersForQuestion(question.id)
+              setSelectedQuestion(question.id)}} key={1} accordion >
+            
+              <Panel header={question.questionTxt} key={index}>
+                <List
+                  size="small"
+                  // header={<div className={'font-bold'}>Answers List</div>}
+                  footer={<div>
+                      <input value={newAnswer} onChange={(ev) => {
+                          setNewAnswer(ev.currentTarget.value);
+                      }} type="text" className={'border p-1 mr-5 w-2/3'}/>
+                      <button type={'button'} onClick={createNewAnswer} className={'btn btn-success'}>Add Answer</button>
+                  </div>}
+                  bordered
+                  dataSource={question.Answers}
+                  renderItem={answer => <List.Item>
                       <div>
-                        {answer.answerTxt}
+                          {answer.answerTxt}
                       </div>
-                    </List.Item>}
+
+                  </List.Item>}
                   />
-                  </Panel>
-              
-              })}
-              
-            </Collapse>}
+              </Panel>
+            
+          </Collapse>})}
+
+
+
+            {/* i need to set the selectedQuestion in here
+            set id of current question into setSelectedQuestion(question.id)*/}
+           
+           {/* {selectedCategory && <Collapse onChange={() => {setSelectedQuestion(questions.id)
+           fetchAnswersForQuestion(selectedQuestion)}} accordion>
+                {questions && questions.map((question, index) => {
+                    return <Panel header={question.questionTxt} key={index}>
+
+
+                        <List
+                            size="small"
+                            // header={<div className={'font-bold'}>Answers List</div>}
+                            footer={<div>
+                                <input type="text" value={newAnswer} onChange={(ev) => {
+                                setNewAnswer(ev.currentTarget.value);
+                                }}placeholder={'New Answer Here'} className={'p-1 mx-2 w-75'}></input>
+                                <button type={'primary'} onClick={createNewAnswer} className={'taskButton btn btn-success'}>Add Answer</button>
+                            </div>}
+                            bordered
+                            dataSource={question.Answers}
+                            renderItem={answer => <List.Item>
+                                <div>
+                                    {answer.answerTxt}
+                                </div>
+
+                            </List.Item>}
+                        />
+
+
+                    </Panel>
+                })}
+            </Collapse>} */}
 
             {!selectedCategory && <h1 className={'text-center'}>Select a Category!</h1>}
 
