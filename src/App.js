@@ -18,6 +18,12 @@ const [answers, setAnswers] = useState([]);
 
 let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
+const onCollapseChange = async (selectedQuestion) => {
+setSelectedQuestion(selectedQuestion);
+fetchAnswersForQuestion(selectedQuestion);
+setNewAnswer('');
+};
+
 const fetchCategories = async () => {
   //console.log(process.env.REACT_APP_API_URL);
   let res = await fetch(`${apiUrl}/api/v1/categories`);
@@ -61,6 +67,11 @@ const createNewAnswer = async () => {
   setNewAnswer('');
   //fetchAnswersForQuestion(selectedQuestion);
   fetchQuestionsForCategory(selectedCategory);
+}
+
+const deleteQuestion = async (id) => {
+  console.log('delete question with id', id)
+  await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}/answers/${id}`, {method: 'DELETE'})
 }
 
   useEffect(() => {
@@ -116,9 +127,9 @@ const createNewAnswer = async () => {
               })}
             </ul> */}
 
-          </div>
-
         </div>
+
+      </div>
 
         <div className={"col-12 col-md-8 border p3"}>
           <div className={"Row"}>
@@ -133,76 +144,43 @@ const createNewAnswer = async () => {
                 })}
               </ul> */}
 
-          {selectedCategory && 
-            <div className={'d-flex justify-content-center py-2'}>
-                    <input type="text" value={newQuestion} onChange={(ev) => {
-                      setNewQuestion(ev.currentTarget.value);
-                    }} placeholder={'New Question Here'} className={'p-1 mx-2 w-75'}></input>
-                    <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success'}>Add Question</button>            
-            </div>
-          }
+            {selectedCategory && 
+              <div className={'d-flex justify-content-center py-2'}>
+                      <input type="text" value={newQuestion} onChange={(ev) => {
+                        setNewQuestion(ev.currentTarget.value);
+                      }} placeholder={'New Question Here'} className={'p-1 mx-2 w-75'}></input>
+                      <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success'}>Add Question</button>            
+              </div>
+            }
 
-          {selectedCategory && questions.map((question, index) => {
-            return <Collapse onChange={() => {fetchAnswersForQuestion(question.id)
-              setSelectedQuestion(question.id)}} key={1} accordion >
-            
-              <Panel header={question.questionTxt} key={index}>
-                <List
-                  size="small"
-                  // header={<div className={'font-bold'}>Answers List</div>}
-                  footer={<div>
-                      <input value={newAnswer} onChange={(ev) => {
-                          setNewAnswer(ev.currentTarget.value);
-                      }} type="text" className={'border p-1 mr-5 w-2/3'}/>
-                      <button type={'button'} onClick={createNewAnswer} className={'btn btn-success'}>Add Answer</button>
-                  </div>}
-                  bordered
-                  dataSource={question.Answers}
-                  renderItem={answer => <List.Item>
-                      <div>
-                          {answer.answerTxt}
-                      </div>
+              {selectedCategory && <Collapse onChange={onCollapseChange} accordion>
+                {questions.map((question) => {
+                  return <Panel header={question.questionTxt}
+                  key={question.id} 
+                  extra={<button onClick={deleteQuestion} type={'button'} className={'btn btn-danger m-2'}>
+                  <i className={'fas fa-trash'}></i>
+                  </button>}
+                >
+                  <List
+                    size="small"
+                    // header={<div className={'font-bold'}>Answers List</div>}
+                    footer={<div>
+                        <input value={newAnswer} onChange={(ev) => {
+                            setNewAnswer(ev.currentTarget.value);
+                        }} type="text" className={'border p-1 mr-5 w-2/3'}/>
+                        <button type={'button'} onClick={createNewAnswer} className={'btn btn-success'}>Add Answer</button>
+                    </div>}
+                    bordered
+                    dataSource={question.Answers}
+                    renderItem={answer => <List.Item>
+                        <div>
+                            {answer.answerTxt}
+                        </div>
 
-                  </List.Item>}
+                    </List.Item>}
                   />
-              </Panel>
-            
-          </Collapse>})}
-
-
-
-            {/* i need to set the selectedQuestion in here
-            set id of current question into setSelectedQuestion(question.id)*/}
-           
-           {/* {selectedCategory && <Collapse onChange={() => {setSelectedQuestion(questions.id)
-           fetchAnswersForQuestion(selectedQuestion)}} accordion>
-                {questions && questions.map((question, index) => {
-                    return <Panel header={question.questionTxt} key={index}>
-
-
-                        <List
-                            size="small"
-                            // header={<div className={'font-bold'}>Answers List</div>}
-                            footer={<div>
-                                <input type="text" value={newAnswer} onChange={(ev) => {
-                                setNewAnswer(ev.currentTarget.value);
-                                }}placeholder={'New Answer Here'} className={'p-1 mx-2 w-75'}></input>
-                                <button type={'primary'} onClick={createNewAnswer} className={'taskButton btn btn-success'}>Add Answer</button>
-                            </div>}
-                            bordered
-                            dataSource={question.Answers}
-                            renderItem={answer => <List.Item>
-                                <div>
-                                    {answer.answerTxt}
-                                </div>
-
-                            </List.Item>}
-                        />
-
-
-                    </Panel>
-                })}
-            </Collapse>} */}
+                </Panel>})}
+              </Collapse>}
 
             {!selectedCategory && <h1 className={'text-center'}>Select a Category!</h1>}
 
@@ -218,6 +196,6 @@ const createNewAnswer = async () => {
  
     </>
    );
-}
+  }
 
 export default App;
