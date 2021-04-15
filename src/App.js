@@ -8,71 +8,81 @@ const { Panel } = Collapse;
 
 function App() {
   
-const [categories, setCategories] = useState([]);
-const [selectedCategory, setSelectedCategory] = useState();
-const [questions, setQuestions] = useState([]);
-const [newQuestion, setNewQuestion] = useState('');
-const [selectedQuestion, setSelectedQuestion] = useState();
-const [newAnswer, setNewAnswer] = useState('');
-const [answers, setAnswers] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState();
+  const [questions, setQuestions] = useState([]);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [selectedQuestion, setSelectedQuestion] = useState();
+  const [newAnswer, setNewAnswer] = useState('');
+  const [answers, setAnswers] = useState([]);
 
-let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+  let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
-const onCollapseChange = async (selectedQuestion) => {
-setSelectedQuestion(selectedQuestion);
-fetchAnswersForQuestion(selectedQuestion);
-setNewAnswer('');
-};
-
-const fetchCategories = async () => {
-  //console.log(process.env.REACT_APP_API_URL);
-  let res = await fetch(`${apiUrl}/api/v1/categories`);
-  let data = await res.json();
-  setCategories(data);
-}
-
-const fetchQuestionsForCategory = async (id) => {
-  console.log('fetch questions for category id', id);
-  let res = await fetch(`${apiUrl}/api/v1/categories/${id}/questions`);
-  let data = await res.json();
-  console.log(data);
-  setQuestions(data);
-
-}
-
-const fetchAnswersForQuestion = async (id) => {
-  console.log('fetch answers for question id', id);
-  let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${id}/answers`);
-  let data = await res.json();
-  console.log(data);
-  setAnswers(data);
-}
-
-const createNewQuestion = async () => {
-  console.log('created new question for categoryId ', selectedCategory)
-  let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions`, {method: 'POST',
-  headers:{'Content-Type': 'application/json'},
-  body: JSON.stringify({questionTxt: newQuestion})
-  });
-  setNewQuestion('');
-  fetchQuestionsForCategory(selectedCategory);
-}
-
-const createNewAnswer = async () => {
-  console.log('This creates a new answer for questionId', selectedQuestion)
-  let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}/answers`, {method: 'POST',
-  headers:{'Content-Type': 'application/json'},
-  body: JSON.stringify({answerTxt: newAnswer})
-  });
+  const onCollapseChange = async (selectedQuestion) => {
+  setSelectedQuestion(selectedQuestion);
+  fetchAnswersForQuestion(selectedQuestion);
   setNewAnswer('');
-  //fetchAnswersForQuestion(selectedQuestion);
-  fetchQuestionsForCategory(selectedCategory);
-}
+  
+  };
 
-const deleteQuestion = async (id) => {
-  console.log('delete question with id', id)
-  await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}/answers/${id}`, {method: 'DELETE'})
-}
+  const fetchCategories = async () => {
+    //console.log(process.env.REACT_APP_API_URL);
+    let res = await fetch(`${apiUrl}/api/v1/categories`);
+    let data = await res.json();
+    setCategories(data);
+  }
+
+  const fetchQuestionsForCategory = async (id) => {
+    console.log('fetch questions for category id', id);
+    let res = await fetch(`${apiUrl}/api/v1/categories/${id}/questions`);
+    let data = await res.json();
+    console.log(data);
+    setQuestions(data);
+
+  }
+
+  const fetchAnswersForQuestion = async (id) => {
+    console.log('fetch answers for question id', id);
+    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${id}/answers`);
+    let data = await res.json();
+    console.log(data);
+    setAnswers(data);
+  }
+
+  const createNewQuestion = async () => {
+    console.log('created new question for categoryId ', selectedCategory)
+    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions`, {method: 'POST',
+    headers:{'Content-Type': 'application/json'},
+    body: JSON.stringify({questionTxt: newQuestion})
+    });
+    setNewQuestion('');
+    fetchQuestionsForCategory(selectedCategory);
+  }
+
+  const createNewAnswer = async () => {
+    console.log('This creates a new answer for questionId', selectedQuestion)
+    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}/answers`, {method: 'POST',
+    headers:{'Content-Type': 'application/json'},
+    body: JSON.stringify({answerTxt: newAnswer})
+    });
+    setNewAnswer('');
+    //fetchAnswersForQuestion(selectedQuestion);
+    fetchQuestionsForCategory(selectedCategory);
+  }
+
+  const deleteQuestion = async (e) => {
+    e.stopPropagation();
+    onCollapseChange(selectedQuestion);
+    console.log('delete question with id', selectedQuestion)
+    await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}`, {method: 'DELETE'})
+    fetchQuestionsForCategory(selectedCategory);
+    
+  }
+
+  // const testFunction = async(ev) => {
+  //     window.deleteQuestion(ev)
+  // }
+
 
   useEffect(() => {
 
@@ -108,6 +118,7 @@ const deleteQuestion = async (id) => {
                 <div className={category.id == selectedCategory ? 'my-1 px-1 bg-success text-light cursor-pointer' : 'my-1 cursor-pointer' } 
                   onClick={() => {setSelectedCategory(category.id)
                   fetchQuestionsForCategory(category.id)
+                  setNewQuestion('');
                 }}>
                   {category.name}
                 </div>
@@ -157,10 +168,11 @@ const deleteQuestion = async (id) => {
                 {questions.map((question) => {
                   return <Panel header={question.questionTxt}
                   key={question.id} 
-                  extra={<button onClick={deleteQuestion} type={'button'} className={'btn btn-danger m-2'}>
+                  extra={selectedQuestion == question.id && <button type={'danger'} onClick={deleteQuestion} type={'button'} className={'btn btn-danger'}>
                   <i className={'fas fa-trash'}></i>
-                  </button>}
-                >
+                  </button>
+                  }>
+                
                   <List
                     size="small"
                     // header={<div className={'font-bold'}>Answers List</div>}
