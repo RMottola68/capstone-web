@@ -20,7 +20,7 @@ function Dashboard() {
   const [userId, setUserId] = useState();
 
   //heroku hosting url
-  let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+  let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000' || 'us-cdbr-east-03.cleardb.com';
 
   //sets the selectedQuestion state upon selecting a question panel
   const onCollapseChange = async (selectedQuestion) => {
