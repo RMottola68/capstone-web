@@ -22,13 +22,10 @@ function Auth () {
   const [password, setPassword] = useState('');
   const [retypePassword, setRetypePassword] = useState('');
 
-  let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+  let apiUrl =  'http://localhost:3000' || 'us-cdbr-east-03.cleardb.com' || process.env.REACT_APP_API_URL;
 
   const onSignIn = async (event) => {
     event.preventDefault();  
-    console.log(email);
-    console.log(password);
-    console.log(retypePassword);
     let res = await fetch(`${apiUrl}/login`, {
       method: 'POST',
       headers: {
@@ -47,9 +44,6 @@ function Auth () {
 
   const onSignUp = async (event) => {
     event.preventDefault();  
-    console.log(email);
-    console.log(password);
-    console.log(retypePassword);
     let res = await fetch(`${apiUrl}/signup`, {
       method: 'POST',
       headers: {
@@ -61,7 +55,7 @@ function Auth () {
     let data = await res.json();
     console.log(data)
     if(data.success){
-      //create an alert for signup and redirect to dashboard
+      // create an alert for signup and redirect to dashboard
       notification['success']({
         message: 'Thanks for Signing Up!',
         description:

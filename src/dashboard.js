@@ -19,7 +19,7 @@ function Dashboard() {
   const [token, setToken] = useState();
   const [userId, setUserId] = useState();
 
-  //heroku hosting url
+  // heroku hosting url
   let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000' || 'us-cdbr-east-03.cleardb.com';
 
   //sets the selectedQuestion state upon selecting a question panel
@@ -198,7 +198,7 @@ function Dashboard() {
                       <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success'}>Add Question</button>            
               </div>
             }
-              //displays the panels for each question once a category is selected
+              {/* displays the panels for each question once a category is selected */}
               {selectedCategory && <Collapse onChange={onCollapseChange} accordion>
                 {questions.map((question) => {
                   return <Panel header={question.questionTxt}
