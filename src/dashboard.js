@@ -128,52 +128,52 @@ function Dashboard() {
   return (
     <>
  
-     {loggedIn && <div className={'navbar bg-success border-bottom justify-content-center'}>
-       <h1 className={'text-light'}>Quiz App
-       <button type={'button'} className={'btn btn-outline-light btn-lg'} onClick={logout}>Log Out</button>
-       </h1>
-     </div>}
-     
-     {loggedIn && <div className={'container-fluid'}>
-       <div className={'row inline-flex '}>
+      {loggedIn && <nav className={'navbar navbar-success bg-success border-bottom '}>
         
-        <div className={"col-12 col-md-4 p-4 inline-flex"}>
-          <div className={"row"}>
+          <h1 className={'text-light pt-2'}>Quiz App</h1>
+          <button type={'button'} className={'btn btn-outline-light btn-lg'} onClick={logout}>Log Out</button>
+        
+      </nav>}
+     
+      {loggedIn && <div className={'container'}>
+        <div className={'row'}>
+        
+          <div className={"col-12 col-md-4 p-4 inline-flex"}>
+            <div>
 
-            <List
-              size="small"
-              header={<div className={'font-weight-bold text-center'}>Category List</div>}
-              bordered
-              dataSource={categories}
-              renderItem={category => <List.Item type={'button'} className={category.id == selectedCategory ? 'bg-success text-light border' : '' }>
-                <h4 className={'p-3 m-0'}
-                  onClick={() => {setSelectedCategory(category.id)
-                  fetchQuestionsForCategory(category.id)
-                  setNewQuestion('');
-                }}>
-                  {category.name}
-                </h4>
-              </List.Item>}
-            />
-            
-            {/* <ul className={'list-unstyled'}>
-              {categories.map((category, index) => {
-                return <li key={index} 
-                  className={category.id == selectedCategory ? 'border my-1 bg-success text-light cursor-pointer' : 'border my-1 cursor-pointer' } 
-                  onClick={() => {setSelectedCategory(category.id)
-                  fetchQuestionsForCategory(category.id)
+              <List className={'bg-light rounded'}
+                size="small"
+                header={<div className={'font-weight-bold text-center'}>Category List</div>}
+                bordered
+                dataSource={categories}
+                renderItem={category => <List.Item type={'button'} className={category.id == selectedCategory ? 'bg-success text-light border border-dark col justify-content-center' : 'border border-dark col justify-content-center' }>
+                  <h4 className={'p-3 m-0 '}
+                    onClick={() => {setSelectedCategory(category.id)
+                    fetchQuestionsForCategory(category.id)
+                    setNewQuestion('');
                   }}>
-                  {category.name}
-                
-                </li>
-              })}
-            </ul> */}
+                    {category.name}
+                  </h4>
+                </List.Item>}
+              />
+              
+              {/* <ul className={'list-unstyled'}>
+                {categories.map((category, index) => {
+                  return <li key={index} 
+                    className={category.id == selectedCategory ? 'border my-1 bg-success text-light cursor-pointer' : 'border my-1 cursor-pointer' } 
+                    onClick={() => {setSelectedCategory(category.id)
+                    fetchQuestionsForCategory(category.id)
+                    }}>
+                    {category.name}
+                  
+                  </li>
+                })}
+              </ul> */}
 
+          </div>
         </div>
 
-      </div>
-
-        <div className={"col-12 col-md-8 border p3"}>
+        <div className={"col-12 col-md-8 border py-3 my-4  bg-light"}>
           <div className={"Row"}>
             
               {/* <button className={'btn btn-outline-success'} onClick={createNewQuestion}>New Question</button> */}
