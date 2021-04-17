@@ -1,7 +1,7 @@
 import './App.css';
 import React, {useEffect, useState} from 'react';
 
-//ant design stuff
+//ant design components
 import { Button , List , Collapse } from 'antd';
 const { Panel } = Collapse;
 
@@ -19,8 +19,10 @@ function Dashboard() {
   const [token, setToken] = useState();
   const [userId, setUserId] = useState();
 
+  //heroku hosting url
   let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
+  //sets the selectedQuestion state upon selecting a question panel
   const onCollapseChange = async (selectedQuestion) => {
   setSelectedQuestion(selectedQuestion);
   fetchAnswersForQuestion(selectedQuestion);
@@ -93,6 +95,7 @@ function Dashboard() {
     setUserId(u.userId);
   }
 
+  //used for loading the proper content only IF a user is logged in
   const isLoggedIn = () => {
     if(localStorage.getItem('token')){
       setLoggedIn(true);
@@ -110,6 +113,7 @@ function Dashboard() {
     window.location.href = '/';
   }
 
+  //sends the user back to the login page if they arent logged in
   useEffect(() => {
     if(isLoggedIn()){
       fetchCategories()
@@ -194,7 +198,7 @@ function Dashboard() {
                       <button type={'primary'} onClick={createNewQuestion} className={'taskButton btn btn-success'}>Add Question</button>            
               </div>
             }
-
+              //displays the panels for each question once a category is selected
               {selectedCategory && <Collapse onChange={onCollapseChange} accordion>
                 {questions.map((question) => {
                   return <Panel header={question.questionTxt}
