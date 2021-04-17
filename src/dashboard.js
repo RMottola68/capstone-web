@@ -15,6 +15,9 @@ function Dashboard() {
   const [selectedQuestion, setSelectedQuestion] = useState();
   const [newAnswer, setNewAnswer] = useState('');
   const [answers, setAnswers] = useState([]);
+  const [loggedIn, setLoggedIn] = useState();
+  const [token, setToken] = useState();
+  const [userId, setUserId] = useState();
 
   let apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
 
@@ -27,14 +30,15 @@ function Dashboard() {
 
   const fetchCategories = async () => {
     //console.log(process.env.REACT_APP_API_URL);
-    let res = await fetch(`${apiUrl}/api/v1/categories`);
+    let res = await fetch(`${apiUrl}/api/v1/categories?token=${localStorage.getItem('token')}`);
     let data = await res.json();
     setCategories(data);
   }
 
   const fetchQuestionsForCategory = async (id) => {
     console.log('fetch questions for category id', id);
-    let res = await fetch(`${apiUrl}/api/v1/categories/${id}/questions`);
+    console.log('fetch id for userId', userId);
+    let res = await fetch(`${apiUrl}/api/v1/categories/${id}/questions?token=${token}&userId=${userId}`);
     let data = await res.json();
     console.log(data);
     setQuestions(data);
@@ -43,7 +47,7 @@ function Dashboard() {
 
   const fetchAnswersForQuestion = async (id) => {
     console.log('fetch answers for question id', id);
-    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${id}/answers`);
+    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${id}/answers?token=${token}`);
     let data = await res.json();
     console.log(data);
     setAnswers(data);
@@ -51,9 +55,11 @@ function Dashboard() {
 
   const createNewQuestion = async () => {
     console.log('created new question for categoryId ', selectedCategory)
-    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions`, {method: 'POST',
+
+
+    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions?token=${token}`, {method: 'POST',
     headers:{'Content-Type': 'application/json'},
-    body: JSON.stringify({questionTxt: newQuestion})
+    body: JSON.stringify({questionTxt: newQuestion, userId: userId})
     });
     setNewQuestion('');
     fetchQuestionsForCategory(selectedCategory);
@@ -61,7 +67,7 @@ function Dashboard() {
 
   const createNewAnswer = async () => {
     console.log('This creates a new answer for questionId', selectedQuestion)
-    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}/answers`, {method: 'POST',
+    let res = await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}/answers?token=${token}`, {method: 'POST',
     headers:{'Content-Type': 'application/json'},
     body: JSON.stringify({answerTxt: newAnswer})
     });
@@ -74,20 +80,43 @@ function Dashboard() {
     e.stopPropagation();
     onCollapseChange(selectedQuestion);
     console.log('delete question with id', selectedQuestion)
-    await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}`, {method: 'DELETE'})
-    //fetchQuestionsForCategory(selectedCategory);
+    await fetch(`${apiUrl}/api/v1/categories/${selectedCategory}/questions/${selectedQuestion}?token=${token}`, {method: 'DELETE'})
+    fetchQuestionsForCategory(selectedCategory);
     window.location.reload();
+  }
+
+
+  const fetchUserId = async() => {
+    let userRes = await fetch(`${apiUrl}/api/v1/users/me?token=${localStorage.getItem('token')}`)
+    let u = await userRes.json();
+    console.log(u);
+    setUserId(u.userId);
+  }
+
+  const isLoggedIn = () => {
+    if(localStorage.getItem('token')){
+      setLoggedIn(true);
+      setToken(localStorage.getItem('token'));
+      fetchUserId();
+      return true;      
+    } else {
+      setLoggedIn(false);
+      return false;      
     }
+  }
 
-
-  // const testFunction = async(ev) => {
-  //     window.deleteQuestion(ev)
-  // }
-
+  const logout = async () => {
+    localStorage.removeItem('token')
+    window.location.href = '/';
+  }
 
   useEffect(() => {
-
-    fetchCategories();
+    if(isLoggedIn()){
+      fetchCategories()
+    } else {
+      window.location.href = '/';
+    }
+    //fetchCategories();
 
   }, [])
 
@@ -95,16 +124,17 @@ function Dashboard() {
   
   }, [selectedCategory])
 
-
   
   return (
     <>
  
-     <div className={'navbar bg-success border-bottom justify-content-center'}>
-       <h1 className={'text-light'}>Quiz App</h1>
-     </div>
+     {loggedIn && <div className={'navbar bg-success border-bottom justify-content-center'}>
+       <h1 className={'text-light'}>Quiz App
+       <button type={'button'} className={'btn btn-outline-light btn-lg'} onClick={logout}>Log Out</button>
+       </h1>
+     </div>}
      
-     <div className={'container-fluid'}>
+     {loggedIn && <div className={'container-fluid'}>
        <div className={'row inline-flex '}>
         
         <div className={"col-12 col-md-4 p-4 inline-flex"}>
@@ -201,8 +231,10 @@ function Dashboard() {
           </div>
         </div>
        </div>
-     </div>
- 
+      </div>}
+
+      {!loggedIn && <h1 className={'text-center text-danger'}>YOU'RE NOT SUPPOSED TO BE HERE!</h1>}
+    
      
      
  

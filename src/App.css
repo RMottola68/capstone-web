@@ -1,5 +1,11 @@
 @import '~antd/dist/antd.css';
 
+body {
+  
+  background-color: rgb(41,43,44);
+  
+}
+
 /* .App {
   text-align: center;
 }
