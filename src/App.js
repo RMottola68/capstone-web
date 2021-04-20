@@ -109,7 +109,7 @@ function Auth () {
                 </Col>
                 <Col span={24} flex={''} className={'mt-5'}>
                       <input type="password" value={retypePassword} onChange={(ev) => setRetypePassword(ev.currentTarget.value)} required className={'border border-success w-100 rounded'} placeholder={'Retype Password'}/>
-                      {(password != retypePassword) && <small className={'text-danger font-weight-bold'}>Passwords don't match</small>}
+                      {(password != retypePassword) && <small className={'text-danger font-weight-bold d-flex'}>Passwords don't match</small>}
                 </Col>
                 <Col span={24} className={'d-flex mt-5 justify-content-center'}>
                     <button  type={'submit'} className={'btn btn-success'}>Submit</button>
